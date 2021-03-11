@@ -13,6 +13,6 @@ type CurrentGasPrice struct {
 
 func (c *CurrentGasPrice) String() string {
 
-	return fmt.Sprintf("fastest : %f | fast : %f | average : %f | safeLow : %f", c.Fastest, c.Fast, c.Average, c.SafeLow)
+	return fmt.Sprintf("fastest : %.2f Gwei | fast : %.2f Gwei | average : %.2f Gwei | safeLow : %.2f Gwei", c.Fastest, c.Fast, c.Average, c.SafeLow)
 
 }
