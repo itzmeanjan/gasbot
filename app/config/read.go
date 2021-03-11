@@ -31,3 +31,24 @@ func GetGaszQueryURL() string {
 	return "https://gasz.in/v1/latest"
 
 }
+
+// GetPort - Service to run on this port number
+func GetPort() uint {
+
+	if port := GetUint("Port"); port > 1024 {
+		return port
+	}
+
+	return 7000
+
+}
+
+// GetToken - Token for interacting with Telegram HTTP API
+func GetToken() string {
+	return Get("Token")
+}
+
+// GetURL - Returns public URL of bot
+func GetURL() string {
+	return Get("Url")
+}
