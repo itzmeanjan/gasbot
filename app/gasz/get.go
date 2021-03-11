@@ -11,11 +11,15 @@ import (
 	"github.com/itzmeanjan/gasbot/app/data"
 )
 
-// CurrentGasPrice - Queries `gasz` service for current recommended
-// gas price & returns repsonse back
+// GetHTTPClient - HTTP client to be used for talking to
+// Telegram servers & `gasz : Ethereum Gas Price Notifier` server
 //
-// @note Caller is supposed to handle errors responsibily
-func CurrentGasPrice() (*data.CurrentGasPrice, error) {
+// When new message will be received from telegram over
+// Webhook, it'll be responded back using this custom HTTP client
+//
+// When it's required to talk to `gasz`, for getting latest gas price feed
+// this client to be used
+func GetHTTPClient() *http.Client {
 
 	// Dialing will spend at max 1 second
 	dialer := &net.Dialer{
@@ -35,6 +39,18 @@ func CurrentGasPrice() (*data.CurrentGasPrice, error) {
 		Timeout:   time.Duration(3) * time.Second,
 		Transport: transport,
 	}
+
+	return client
+
+}
+
+// CurrentGasPrice - Queries `gasz` service for current recommended
+// gas price & returns repsonse back
+//
+// @note Caller is supposed to handle errors responsibily
+func CurrentGasPrice() (*data.CurrentGasPrice, error) {
+
+	client := GetHTTPClient()
 
 	// Making HTTP GET request to remote for getting
 	// latest gas price recommendation

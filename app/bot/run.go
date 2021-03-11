@@ -4,44 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net"
-	"net/http"
-	"time"
 
 	"github.com/itzmeanjan/gasbot/app/config"
 	"github.com/itzmeanjan/gasbot/app/gasz"
 	"gopkg.in/tucnak/telebot.v2"
 )
-
-// GetHTTPClient - HTTP client to be used for talking to
-// Telegram servers
-//
-// When new message will be received from telegram over
-// Webhook, it'll be responded back using this custom HTTP client
-func GetHTTPClient() *http.Client {
-
-	// Dialing will spend at max 1 second
-	dialer := &net.Dialer{
-		Timeout: time.Duration(1) * time.Second,
-	}
-
-	// TLS handshake must happen with in 1 second
-	transport := &http.Transport{
-		DialContext:         dialer.DialContext,
-		TLSHandshakeTimeout: time.Duration(1) * time.Second,
-	}
-
-	// Whole process must happen with in 3 seconds
-	//
-	// Otherwise it'll time out
-	client := &http.Client{
-		Timeout:   time.Duration(3) * time.Second,
-		Transport: transport,
-	}
-
-	return client
-
-}
 
 // Run - Starts Telegram bot
 func Run() error {
@@ -63,7 +30,7 @@ func Run() error {
 	settings := telebot.Settings{
 		Token:  token,
 		Poller: webhook,
-		Client: GetHTTPClient(),
+		Client: gasz.GetHTTPClient(),
 	}
 
 	bot, err := telebot.NewBot(settings)
