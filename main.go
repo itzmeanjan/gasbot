@@ -3,19 +3,15 @@ package main
 import (
 	"log"
 
-	"github.com/itzmeanjan/gasbot/app/gasz"
+	"github.com/itzmeanjan/gasbot/app/bot"
 )
 
 func main() {
 
 	log.Printf("🚀 gasbot - Telegram Bot for Ethereum Gas Price Notification")
 
-	gasPrice, err := gasz.CurrentGasPrice()
-	if err != nil {
-		log.Printf("🚫 Failed to get latest gas price : %s\n", err.Error())
-		return
+	if err := bot.Run(); err != nil {
+		log.Printf("🚫 Bot stopped : %s\n", err.Error())
 	}
-
-	log.Printf("%v\n", gasPrice)
 
 }

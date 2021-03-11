@@ -48,7 +48,8 @@ func GetToken() string {
 	return Get("Token")
 }
 
-// GetURL - Returns public URL of bot
+// GetURL - Returns public URL of this service
+// to which telegram will talk to
 func GetURL() string {
 	return Get("Url")
 }
