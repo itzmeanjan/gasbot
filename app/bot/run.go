@@ -42,7 +42,7 @@ func Run(resources *data.Resources) error {
 
 	bot.Handle("/start", func(m *telebot.Message) {
 
-		log.Printf("📩 [ /start ] : From %s\n", m.Sender.Username)
+		log.Printf("📩 [ /start ] : From @%s\n", m.Sender.Username)
 
 		bot.Send(m.Sender, "Ethereum Gas Price Notifier @ https://gasz.in\n\n/latest : Latest Ethereum Gas Price recommendation\n\nBuilt & maintained by Anjan Roy<anjanroy@yandex.com>\n\nFind more about me @ https://itzmeanjan.in")
 
@@ -50,7 +50,7 @@ func Run(resources *data.Resources) error {
 
 	bot.Handle("/latest", func(m *telebot.Message) {
 
-		log.Printf("📩 [ /latest ] : From %s\n", m.Sender.Username)
+		log.Printf("📩 [ /latest ] : From @%s\n", m.Sender.Username)
 
 		// Send latest gas price feed, which was received
 		// from `gasz` subscription
@@ -58,7 +58,7 @@ func Run(resources *data.Resources) error {
 
 	})
 
-	log.Printf("✅ Starting `%s`\n", bot.Me.Username)
+	log.Printf("✅ Starting @%s\n", bot.Me.Username)
 
 	// This is a blocking call
 	bot.Start()
