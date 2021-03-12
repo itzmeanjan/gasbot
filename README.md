@@ -1,5 +1,5 @@
-# gasbot
-Telegram Bot for Ethereum Gas Price Notification
+# gasbot 🤖
+Telegram Bot for Ethereum Gas Price Notification `@EthereumGasPriceNotifier_bot`
 
 ## Motivation
 
@@ -25,7 +25,7 @@ But browsers sometimes behave unexpectedly
 - Also there're common cases like, you quiting browser window/ putting your machine into sleep
 - In all these cases connection will get hampered & `gasz` doesn't remember who subscribed to what, one connection is lost. So reconnection is not so helpful. You have to subscribe again.
 
-Due to all these problems, I thought of writing one Telegram Bot which will help me in easily notifying you to Ethereum Gas Price changes, when you subscribe to. You can also check what's current recommended gas price.
+Due to all these problems, I thought of writing one Telegram Bot which will help me in easily notifying you about Ethereum Gas Price changes, when you subscribe to. You can also check what's current recommended gas price.
 
 ## Installation
 
@@ -69,3 +69,13 @@ Port | Run HTTP server on this port, where Telegram will send payload, when some
 ```bash
 make run
 ```
+
+## Usage
+
+
+- Find `@EthereumGasPriceNotifier_bot` on Telegram & **start** it
+- You can ask it for latest recommended Ethereum Gas Price, by sending command `/latest`
+
+![bot_at_work](./sc/bot_at_work.jpg)
+
+**Gas Price Subscription feature coming soon ...**
