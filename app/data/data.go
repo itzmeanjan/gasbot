@@ -39,3 +39,8 @@ type Response struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
+
+// Resources - ...
+type Resources struct {
+	Latest *CurrentGasPrice
+}

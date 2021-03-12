@@ -13,7 +13,7 @@ import (
 )
 
 // SubscribeToLatest - Subscribe to latest gas price feed of `gasz`
-func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
+func SubscribeToLatest(ctx context.Context, comm chan<- struct{}, resources *data.Resources) {
 
 	netDialer := &net.Dialer{
 		Timeout: time.Duration(5) * time.Second,
@@ -43,6 +43,7 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	}
 
+	// Scheduling clean up from now
 	defer func() {
 		close(comm)
 		conn.Close()
@@ -50,6 +51,8 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	conn.SetReadDeadline(time.Now().Add(time.Duration(5) * time.Second))
 
+	// Handle ping messages received from server &
+	// increment read deadline
 	conn.SetPingHandler(func(appData string) error {
 
 		conn.SetReadDeadline(time.Now().Add(time.Duration(15) * time.Second))
@@ -64,6 +67,8 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 		Operator:  "*",
 	}
 
+	// Send subscription request, for receiving
+	// latest gas price feed
 	if err := conn.WriteJSON(subPayload); err != nil {
 
 		log.Printf("❗️ Failed to send subscription request to Gas Price feed : %s\n", err.Error())
@@ -73,6 +78,7 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	var confirmation data.Response
 
+	// Waiting for subscription confirmation message from `gasz`
 	if err := conn.ReadJSON(&confirmation); err != nil {
 
 		log.Printf("❗️ Failed to receive subscription confirmation from Gas Price feed : %s\n", err.Error())
@@ -80,6 +86,7 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	}
 
+	// Subscription attempt failed
 	if confirmation.Code != 1 {
 
 		log.Printf("❗️ Gas Price feed subscription denied\n")
@@ -89,6 +96,8 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	log.Printf("✅ Subscribed to latest Gas Price feed\n")
 
+	// Iteratively keep reading latest gas price updates
+	// & put fresh data in shared resource
 	for {
 
 		var gasPrice data.CurrentGasPrice
@@ -100,7 +109,10 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 		}
 
-		log.Printf("%s\n", gasPrice.String())
+		// Updating shared resource with latest gas price
+		resources.Latest = &gasPrice
+
+		log.Printf("%s\n", resources.Latest.String())
 
 	}
 

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/itzmeanjan/gasbot/app/config"
+	"github.com/itzmeanjan/gasbot/app/data"
 	"github.com/itzmeanjan/gasbot/app/gasz"
 )
 
@@ -61,7 +62,9 @@ func main() {
 
 	}()
 
-	gasz.SubscribeToLatest(ctx, comm)
+	resource := &data.Resources{Latest: &data.CurrentGasPrice{}}
+
+	gasz.SubscribeToLatest(ctx, comm, resource)
 
 	/*
 		if err := bot.Run(); err != nil {
