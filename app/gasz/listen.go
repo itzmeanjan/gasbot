@@ -112,7 +112,7 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}, resources *dat
 		// Updating shared resource with latest gas price
 		resources.Latest = &gasPrice
 
-		log.Printf("%s\n", resources.Latest.String())
+		log.Printf("⚡️ %s\n", resources.Latest.String())
 
 	}
 

@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/itzmeanjan/gasbot/app/bot"
 	"github.com/itzmeanjan/gasbot/app/config"
 	"github.com/itzmeanjan/gasbot/app/data"
 	"github.com/itzmeanjan/gasbot/app/gasz"
@@ -62,14 +63,14 @@ func main() {
 
 	}()
 
-	resource := &data.Resources{Latest: &data.CurrentGasPrice{}}
+	resources := &data.Resources{Latest: &data.CurrentGasPrice{}}
 
-	gasz.SubscribeToLatest(ctx, comm, resource)
+	// Starting gas price subscriber as different go routine
+	go gasz.SubscribeToLatest(ctx, comm, resources)
 
-	/*
-		if err := bot.Run(); err != nil {
-			log.Printf("🚫 Bot stopped : %s\n", err.Error())
-		}
-	*/
+	// Main go routine works as bot
+	if err := bot.Run(resources); err != nil {
+		log.Printf("🚫 Bot stopped : %s\n", err.Error())
+	}
 
 }

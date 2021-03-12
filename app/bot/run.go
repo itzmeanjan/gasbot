@@ -6,12 +6,14 @@ import (
 	"log"
 
 	"github.com/itzmeanjan/gasbot/app/config"
+	"github.com/itzmeanjan/gasbot/app/data"
 	"github.com/itzmeanjan/gasbot/app/gasz"
 	"gopkg.in/tucnak/telebot.v2"
 )
 
-// Run - Starts Telegram bot
-func Run() error {
+// Run - Starts Telegram bot & keeps serving
+// requests
+func Run(resources *data.Resources) error {
 
 	endpoint := &telebot.WebhookEndpoint{
 		PublicURL: config.GetURL(),
@@ -50,15 +52,9 @@ func Run() error {
 
 		log.Printf("📩 [ /latest ] : From %s\n", m.Sender.Username)
 
-		gasPrice, err := gasz.CurrentGasPrice()
-		if err != nil {
-
-			log.Printf("❗️ Failed to get latest gas price : %s\n", err.Error())
-			return
-
-		}
-
-		bot.Send(m.Sender, gasPrice.Sendable())
+		// Send latest gas price feed, which was received
+		// from `gasz` subscription
+		bot.Send(m.Sender, resources.Latest.Sendable())
 
 	})
 

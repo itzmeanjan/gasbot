@@ -1,14 +1,9 @@
 package gasz
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/itzmeanjan/gasbot/app/config"
-	"github.com/itzmeanjan/gasbot/app/data"
 )
 
 // GetHTTPClient - HTTP client to be used for talking to
@@ -41,43 +36,5 @@ func GetHTTPClient() *http.Client {
 	}
 
 	return client
-
-}
-
-// CurrentGasPrice - Queries `gasz` service for current recommended
-// gas price & returns repsonse back
-//
-// @note Caller is supposed to handle errors responsibily
-func CurrentGasPrice() (*data.CurrentGasPrice, error) {
-
-	client := GetHTTPClient()
-
-	// Making HTTP GET request to remote for getting
-	// latest gas price recommendation
-	resp, err := client.Get(config.GetGaszQueryURL())
-	if err != nil {
-		return nil, err
-	}
-
-	// Scheduling closure of response body
-	//
-	// @note To be invoked when returning from this execution scope
-	defer resp.Body.Close()
-
-	// Reading whole body of response in byte array
-	_data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var gasPrice data.CurrentGasPrice
-
-	// Attempting to deserialize byte array into structured format
-	// so that it can be easily interacted with
-	if err := json.Unmarshal(_data, &gasPrice); err != nil {
-		return nil, err
-	}
-
-	return &gasPrice, nil
 
 }
