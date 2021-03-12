@@ -42,7 +42,7 @@ func Run() error {
 
 		log.Printf("📩 [ /start ] : From %s\n", m.Sender.Username)
 
-		bot.Send(m.Sender, "Ethereum Gas Price Notifier @ https://gasz.in\n\nBuilt & maintained by Anjan Roy<anjanroy@yandex.com>\n\nFind more about me @ https://itzmeanjan.in")
+		bot.Send(m.Sender, "Ethereum Gas Price Notifier @ https://gasz.in\n\n/latest : Latest Ethereum Gas Price recommendation\n\nBuilt & maintained by Anjan Roy<anjanroy@yandex.com>\n\nFind more about me @ https://itzmeanjan.in")
 
 	})
 
@@ -62,7 +62,7 @@ func Run() error {
 
 	})
 
-	log.Printf("✅ Starting %s\n", bot.Me.Username)
+	log.Printf("✅ Starting `%s`\n", bot.Me.Username)
 
 	// This is a blocking call
 	bot.Start()

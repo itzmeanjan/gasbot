@@ -23,20 +23,20 @@ func GetHTTPClient() *http.Client {
 
 	// Dialing will spend at max 1 second
 	dialer := &net.Dialer{
-		Timeout: time.Duration(1) * time.Second,
+		Timeout: time.Duration(5) * time.Second,
 	}
 
 	// TLS handshake must happen with in 1 second
 	transport := &http.Transport{
 		DialContext:         dialer.DialContext,
-		TLSHandshakeTimeout: time.Duration(1) * time.Second,
+		TLSHandshakeTimeout: time.Duration(5) * time.Second,
 	}
 
 	// Whole process must happen with in 3 seconds
 	//
 	// Otherwise it'll time out
 	client := &http.Client{
-		Timeout:   time.Duration(3) * time.Second,
+		Timeout:   time.Duration(10) * time.Second,
 		Transport: transport,
 	}
 
