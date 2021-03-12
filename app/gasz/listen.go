@@ -48,8 +48,11 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 		conn.Close()
 	}()
 
+	conn.SetReadDeadline(time.Now().Add(time.Duration(5) * time.Second))
+
 	conn.SetPingHandler(func(appData string) error {
 
+		conn.SetReadDeadline(time.Now().Add(time.Duration(15) * time.Second))
 		return conn.WriteControl(websocket.PongMessage, []byte(""), time.Now().Add(time.Duration(1)*time.Second))
 
 	})
@@ -84,6 +87,8 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 	}
 
+	log.Printf("✅ Subscribed to latest Gas Price feed\n")
+
 	for {
 
 		var gasPrice data.CurrentGasPrice
@@ -95,7 +100,7 @@ func SubscribeToLatest(ctx context.Context, comm chan<- struct{}) {
 
 		}
 
-		log.Printf("%v\n", gasPrice)
+		log.Printf("%s\n", gasPrice.String())
 
 	}
 

@@ -1,14 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 
-	"github.com/itzmeanjan/gasbot/app/bot"
 	"github.com/itzmeanjan/gasbot/app/config"
+	"github.com/itzmeanjan/gasbot/app/gasz"
 )
 
 func main() {
@@ -32,14 +34,26 @@ func main() {
 
 	// Channel for catching interrupts
 	interruptChan := make(chan os.Signal, 1)
-	signal.Notify(interruptChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+	signal.Notify(interruptChan, syscall.SIGTERM, syscall.SIGINT)
+
+	comm := make(chan struct{}, 1)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 
-		// This is a blocking call
-		//
-		// To be unblocked only when interrupt is received by this process
-		<-interruptChan
+		select {
+
+		case <-interruptChan:
+
+			cancel()
+			<-time.After(time.Duration(1) * time.Second)
+
+		case <-comm:
+
+			// @note Need to handle it better
+			// New subscriber can be spawned
+
+		}
 
 		// Stopping process
 		log.Printf("\n✅ Gracefully shut down `gasbot`\n")
@@ -47,8 +61,12 @@ func main() {
 
 	}()
 
-	if err := bot.Run(); err != nil {
-		log.Printf("🚫 Bot stopped : %s\n", err.Error())
-	}
+	gasz.SubscribeToLatest(ctx, comm)
+
+	/*
+		if err := bot.Run(); err != nil {
+			log.Printf("🚫 Bot stopped : %s\n", err.Error())
+		}
+	*/
 
 }
