@@ -1,5 +1,5 @@
 # gasbot 🤖
-Telegram Bot for Ethereum Gas Price Notification `@EthereumGasPriceNotifier_bot`
+Telegram Bot for Ethereum Gas Price Notification [`@EthereumGasPriceNotifier_bot`](https://t.me/EthereumGasPriceNotifier_bot)
 
 ## Motivation
 
@@ -51,7 +51,7 @@ touch .env
 - Put 👇 content inside `.env`
 
 ```
-GASZ=https://gasz.in/v1/latest
+GASZ_Subscribe=wss://gasz.in/v1/subscribe
 Url=https://<domain>
 Token=<token>
 Port=7000
@@ -59,7 +59,7 @@ Port=7000
 
 Environment Variable | Interpretation
 --- | ---
-GASZ | Latest recommended gas price to be queried from
+GASZ_Subscribe | Subscribe to this service for latest recommended gas price, over websocket transport
 Url | Publicly accessible URL of this bot service
 Token | Your secret token, obtained after registering your bot with `@BotFather`
 Port | Run HTTP server on this port, where Telegram will send payload, when someone interacts with this bot
@@ -68,6 +68,27 @@ Port | Run HTTP server on this port, where Telegram will send payload, when some
 
 ```bash
 make run
+```
+
+## Running in Production
+
+For running this service in production, I'll use `systemd`.
+
+Here's a unit file for that. This can be put in `/etc/systemd/system/gasbot.service`.
+
+```bash
+[Unit]
+Description=gasbot - Ethereum Gas Price Notifier Telegram Bot
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/gasbot
+ExecStart=/home/ubuntu/gasbot/gasbot
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 ## Usage
