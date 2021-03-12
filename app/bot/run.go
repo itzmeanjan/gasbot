@@ -24,7 +24,7 @@ func Run() error {
 
 	token := config.GetToken()
 	if token == "" {
-		return errors.New("Bad Token")
+		return errors.New("bad Token")
 	}
 
 	settings := telebot.Settings{
