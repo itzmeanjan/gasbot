@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"sync"
 	"syscall"
 	"time"
 
@@ -64,7 +65,11 @@ func main() {
 
 	}()
 
-	resources := &data.Resources{Latest: &data.CurrentGasPrice{}}
+	resources := &data.Resources{
+		Latest:        &data.CurrentGasPrice{},
+		Subscriptions: make(map[string]*data.Subscriber),
+		Lock:          &sync.RWMutex{},
+	}
 
 	// Starting gas price subscriber as different go routine
 	go gasz.SubscribeToLatest(ctx, comm, resources)

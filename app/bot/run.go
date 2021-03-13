@@ -40,6 +40,8 @@ func Run(resources *data.Resources) error {
 		return err
 	}
 
+	resources.Bot = bot
+
 	bot.Handle("/start", func(m *telebot.Message) {
 
 		log.Printf("📩 [ /start ] : From @%s\n", m.Sender.Username)
