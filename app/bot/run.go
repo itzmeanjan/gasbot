@@ -70,62 +70,102 @@ func Run(resources *data.Resources) error {
 
 		// -- Buttons for letting user input their choice
 		lesserThan := telebot.InlineButton{
-			Unique: "<",
+			Unique: "lesserThan",
 			Text:   "<",
 		}
 
 		bot.Handle(&lesserThan, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+
+			if !resources.SetSubscriptionOperator(c.Sender, "<") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please send threshold gas price in Gwei")
 
 		})
 
 		greaterThan := telebot.InlineButton{
-			Unique: ">",
+			Unique: "greaterThan",
 			Text:   ">",
 		}
 
 		bot.Handle(&greaterThan, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+
+			if !resources.SetSubscriptionOperator(c.Sender, ">") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please send threshold gas price in Gwei")
 
 		})
 
 		lesserThanOrEqualsTo := telebot.InlineButton{
-			Unique: "<=",
+			Unique: "lesserThanOrEqualsTo",
 			Text:   "<=",
 		}
 
 		bot.Handle(&lesserThanOrEqualsTo, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+
+			if !resources.SetSubscriptionOperator(c.Sender, "<=") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please send threshold gas price in Gwei")
 
 		})
 
 		greaterThanOrEqualsTo := telebot.InlineButton{
-			Unique: ">=",
+			Unique: "greaterThanOrEqualsTo",
 			Text:   ">=",
 		}
 
 		bot.Handle(&greaterThanOrEqualsTo, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+
+			if !resources.SetSubscriptionOperator(c.Sender, ">=") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please send threshold gas price in Gwei")
 
 		})
 
 		equalsTo := telebot.InlineButton{
-			Unique: "==",
+			Unique: "equalsTo",
 			Text:   "==",
 		}
 
 		bot.Handle(&equalsTo, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+
+			if !resources.SetSubscriptionOperator(c.Sender, "==") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please send threshold gas price in Gwei")
 
 		})
 		// -- Buttons end here, along with their respective handler
@@ -164,7 +204,15 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&fastestTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, subStepTwo())
+
+			if !resources.InitSubscription(c.Sender, "fastest") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please choose evaluation operator", subStepTwo())
 
 		})
 
@@ -176,7 +224,15 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&fastTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, subStepTwo())
+
+			if !resources.InitSubscription(c.Sender, "fast") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please choose evaluation operator", subStepTwo())
 
 		})
 
@@ -188,7 +244,15 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&averageTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, subStepTwo())
+
+			if !resources.InitSubscription(c.Sender, "average") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please choose evaluation operator", subStepTwo())
 
 		})
 
@@ -200,7 +264,15 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&safeLowTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, subStepTwo())
+
+			if !resources.InitSubscription(c.Sender, "safeLow") {
+
+				bot.Edit(c.Message, "Something went wrong 😞")
+				return
+
+			}
+
+			bot.Edit(c.Message, "Please choose evaluation operator", subStepTwo())
 
 		})
 		// -- Buttons end here, along with their respective handler

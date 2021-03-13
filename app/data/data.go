@@ -180,16 +180,13 @@ func (r *Resources) InitSubscription(user *telebot.User, txType string) bool {
 		return false
 	}
 
-	r.Lock.RLock()
-	defer r.Lock.RUnlock()
+	r.Lock.Lock()
+	defer r.Lock.Unlock()
 
 	_, ok := r.Subscriptions[user.Username]
 	if ok {
 		return false
 	}
-
-	// -- Acquire lock
-	r.Lock.Lock()
 
 	r.Subscriptions[user.Username] = &Subscriber{
 		InProgress: true,
@@ -198,9 +195,6 @@ func (r *Resources) InitSubscription(user *telebot.User, txType string) bool {
 			Field: txType,
 		},
 	}
-
-	r.Lock.Unlock()
-	// -- Released lock
 
 	return true
 
