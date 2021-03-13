@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"gopkg.in/tucnak/telebot.v2"
@@ -103,13 +104,13 @@ func (p *Payload) PrepareNotification(gasPrice *CurrentGasPrice) string {
 	switch p.Field {
 
 	case "fastest":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Fastest)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Fastest)
 	case "fast":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Fast)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Fast)
 	case "average":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Average)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Average)
 	case "safeLow":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.SafeLow)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.SafeLow)
 	default:
 		// @note Not doing anything here, because result is negative
 
@@ -129,9 +130,37 @@ type Response struct {
 // Resources - These are the resources which are supposed to be accessed
 // by multiple go routines ( can be simultaneously )
 type Resources struct {
+	Bot           *telebot.Bot
 	Latest        *CurrentGasPrice
 	Subscriptions map[string]*Subscriber
 	Lock          *sync.RWMutex
+}
+
+// Notify - As soon as new gas price update is received, it'll
+// iteratively go through each of subscribers & check whether they're
+// eligible to receive this notification or not
+//
+// If yes, they'll be attempted to be notified
+func (r *Resources) Notify() {
+
+	r.Lock.RLock()
+	defer r.Lock.RUnlock()
+
+	for k, v := range r.Subscriptions {
+
+		if !v.CanSendNotification(r.Latest) {
+			continue
+		}
+
+		if err := v.SendNotification(r.Bot, r.Latest); err != nil {
+			log.Printf("❌ Failed to notify @%s that gas price has reached their desired threshold : %s\n", k, err.Error())
+			continue
+		}
+
+		log.Printf("🔔 Notified @%s as Gas Price reached their desired threshold\n", k)
+
+	}
+
 }
 
 // Subscriber - This is one Telegram User, who has interacted with `gasbot`
@@ -148,4 +177,13 @@ type Subscriber struct {
 // It'll be sent, if & only if it satisfies criteria set by user
 func (s *Subscriber) CanSendNotification(gasPrice *CurrentGasPrice) bool {
 	return s.Criteria.SatisfiedBy(gasPrice)
+}
+
+// SendNotification - Sends notification to user, letting them know recommended
+// gas price has reached certain threshold, of their interest
+func (s *Subscriber) SendNotification(handle *telebot.Bot, gasPrice *CurrentGasPrice) error {
+
+	_, err := handle.Send(s.User, s.Criteria.PrepareNotification(gasPrice))
+	return err
+
 }
