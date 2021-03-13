@@ -173,10 +173,23 @@ func (r *Resources) Notify() {
 
 // InitSubscription - Subscription is a multi step operation, this is very beginning of it
 // More info to be collected from user
-func (r *Resources) InitSubscription(user *telebot.User, txType string) {
+func (r *Resources) InitSubscription(user *telebot.User, txType string) bool {
 
+	// Valid tx types to which clients can subscribe to
+	if !(txType == "fastest" || txType == "fast" || txType == "average" || txType == "safeLow") {
+		return false
+	}
+
+	r.Lock.RLock()
+	defer r.Lock.RUnlock()
+
+	_, ok := r.Subscriptions[user.Username]
+	if ok {
+		return false
+	}
+
+	// -- Acquire lock
 	r.Lock.Lock()
-	defer r.Lock.Unlock()
 
 	r.Subscriptions[user.Username] = &Subscriber{
 		InProgress: true,
@@ -186,39 +199,81 @@ func (r *Resources) InitSubscription(user *telebot.User, txType string) {
 		},
 	}
 
+	r.Lock.Unlock()
+	// -- Released lock
+
+	return true
+
 }
 
 // SetSubscriptionOperator - This is second step of subscription to gas price feed
-// where user selects what's operator to be used when checking whether some gas price
+// where user selects what's relative operator to be used when checking whether some gas price
 // update needs to be sent to them or not
-func (r *Resources) SetSubscriptionOperator(user *telebot.User, operator string) {
+func (r *Resources) SetSubscriptionOperator(user *telebot.User, operator string) bool {
+
+	// Valid relative operators
+	if !(operator == "<" || operator == ">" || operator == "<=" || operator == ">=" || operator == "==") {
+		return false
+	}
 
 	r.Lock.RLock()
 	defer r.Lock.RUnlock()
 
-	r.Subscriptions[user.Username].Criteria.Operator = operator
+	sub, ok := r.Subscriptions[user.Username]
+	if !ok {
+		return false
+	}
+
+	if !(sub.InProgress && sub.Criteria.Field != "" && sub.Criteria.Operator == "") {
+		return false
+	}
+
+	sub.Criteria.Operator = operator
+	return true
 
 }
 
-// SetSubscriptionThreshold - When gas price of certain category reaches this value, user
+// SetSubscriptionThreshold - When gas price of certain category reaches this value ( in Gwei ), user
 // wants us to notify them
-func (r *Resources) SetSubscriptionThreshold(user *telebot.User, threshold float64) {
+func (r *Resources) SetSubscriptionThreshold(user *telebot.User, threshold float64) bool {
+
+	// Threshold i.e. gas price value against which comparison to be performed
+	// needs to be >= 1.0 Gwei
+	if !(threshold >= 1.0) {
+		return false
+	}
 
 	r.Lock.RLock()
 	defer r.Lock.RUnlock()
 
-	r.Subscriptions[user.Username].Criteria.Threshold = threshold
+	sub, ok := r.Subscriptions[user.Username]
+	if !ok {
+		return false
+	}
+
+	if !(sub.InProgress && sub.Criteria.Field != "" && sub.Criteria.Operator != "" && sub.Criteria.Threshold == 0) {
+		return false
+	}
+
+	sub.Criteria.Threshold = threshold
+	return true
 
 }
 
 // ConfirmSubscription - This subscription is confirmed, now it can
 // be attempted to be processed when latest gas price feed is received
-func (r *Resources) ConfirmSubscription(user *telebot.User) {
+func (r *Resources) ConfirmSubscription(user *telebot.User) bool {
 
 	r.Lock.Lock()
 	defer r.Lock.Unlock()
 
-	r.Subscriptions[user.Username].InProgress = false
+	sub, ok := r.Subscriptions[user.Username]
+	if !ok {
+		return false
+	}
+
+	sub.InProgress = false
+	return true
 
 }
 
