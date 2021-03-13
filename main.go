@@ -54,6 +54,7 @@ func main() {
 
 			// @note Need to handle it better
 			// New subscriber can be spawned
+			cancel()
 
 		}
 

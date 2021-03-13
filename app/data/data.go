@@ -1,6 +1,10 @@
 package data
 
-import "fmt"
+import (
+	"fmt"
+
+	"gopkg.in/tucnak/telebot.v2"
+)
 
 // CurrentGasPrice - When `gasz` service is queried, it'll send
 // response of this form back
@@ -40,7 +44,17 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-// Resources - ...
+// Resources - These are the resources which are supposed to be accessed
+// by multiple go routines ( can be simultaneously )
 type Resources struct {
-	Latest *CurrentGasPrice
+	Latest        *CurrentGasPrice
+	Subscriptions map[string]*Subscriber
+}
+
+// Subscriber - This is one Telegram User, who has interacted with `gasbot`
+//
+// We're going to be keep track of their subscription interest in this section
+type Subscriber struct {
+	User     *telebot.User
+	Criteria *Payload
 }
