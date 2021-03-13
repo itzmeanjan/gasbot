@@ -37,6 +37,58 @@ type Payload struct {
 	Operator  string  `json:"operator"`
 }
 
+// SatisfiedBy - Performs a check whether current gas price
+// recommendation is satisfying the criteria some user has provided
+//
+// If yes, we can take next steps i.e. sending them notification
+func (p *Payload) SatisfiedBy(gasPrice *CurrentGasPrice) bool {
+
+	checkThreshold := func(price float64) bool {
+
+		var yes bool
+
+		switch p.Operator {
+
+		case "<":
+			yes = price < p.Threshold
+		case ">":
+			yes = price > p.Threshold
+		case "<=":
+			yes = price <= p.Threshold
+		case ">=":
+			yes = price >= p.Threshold
+		case "==":
+			yes = price == p.Threshold
+		default:
+			// @note No need to do anything
+			// Check is going to be return negative result
+		}
+
+		return yes
+
+	}
+
+	var yes bool
+
+	switch p.Field {
+
+	case "fastest":
+		yes = checkThreshold(gasPrice.Fastest)
+	case "fast":
+		yes = checkThreshold(gasPrice.Fast)
+	case "average":
+		yes = checkThreshold(gasPrice.Average)
+	case "safeLow":
+		yes = checkThreshold(gasPrice.SafeLow)
+	default:
+		// @note Not doing anything here, because result is negative
+
+	}
+
+	return yes
+
+}
+
 // Response - Subscription/ unsubscription confirmation messages
 // to be received in this form
 type Response struct {
