@@ -60,6 +60,74 @@ func Run(resources *data.Resources) error {
 
 	})
 
+	fastestTxButton := telebot.InlineButton{
+		Unique: "fastest",
+		Text:   "Fastest",
+	}
+
+	bot.Handle(fastestTxButton, func(c *telebot.Callback) {
+
+		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+		bot.Send(c.Sender, "Fastest")
+
+	})
+
+	// -- Buttons for letting user input
+	fastTxButton := telebot.InlineButton{
+		Unique: "fast",
+		Text:   "Fast",
+	}
+
+	bot.Handle(fastTxButton, func(c *telebot.Callback) {
+
+		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+		bot.Send(c.Sender, "Fast")
+
+	})
+
+	averageTxButton := telebot.InlineButton{
+		Unique: "average",
+		Text:   "Average",
+	}
+
+	bot.Handle(averageTxButton, func(c *telebot.Callback) {
+
+		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+		bot.Send(c.Sender, "Average")
+
+	})
+
+	safeLowTxButton := telebot.InlineButton{
+		Unique: "safeLow",
+		Text:   "SafeLow",
+	}
+
+	bot.Handle(safeLowTxButton, func(c *telebot.Callback) {
+
+		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+		bot.Send(c.Sender, "SafeLow")
+
+	})
+
+	bot.Handle("/subscribe", func(m *telebot.Message) {
+
+		log.Printf("📩 [ /subscribe ] : From @%s\n", m.Sender.Username)
+
+		bot.Send(m.Sender, "Please choose tx category", &telebot.ReplyMarkup{
+			InlineKeyboard: [][]telebot.InlineButton{
+				{
+					fastestTxButton,
+					fastTxButton,
+				},
+				{
+					averageTxButton,
+					safeLowTxButton,
+				},
+			},
+		})
+
+	})
+
 	log.Printf("✅ Starting @%s\n", bot.Me.Username)
 
 	// This is a blocking call
