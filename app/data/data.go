@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"sync"
 
 	"gopkg.in/tucnak/telebot.v2"
 )
@@ -89,6 +90,35 @@ func (p *Payload) SatisfiedBy(gasPrice *CurrentGasPrice) bool {
 
 }
 
+// PrepareNotification - Prepares notification text, that will be sent to user
+// once we've decided whether this user is eligible to receive this notification
+// or not
+//
+// @note Whether eligible or not, that's decided based upon what that user has set
+// in their criteria for receiving notification
+func (p *Payload) PrepareNotification(gasPrice *CurrentGasPrice) string {
+
+	var notification string
+
+	switch p.Field {
+
+	case "fastest":
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Fastest)
+	case "fast":
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Fast)
+	case "average":
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.Average)
+	case "safeLow":
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %f", p.Field, gasPrice.SafeLow)
+	default:
+		// @note Not doing anything here, because result is negative
+
+	}
+
+	return notification
+
+}
+
 // Response - Subscription/ unsubscription confirmation messages
 // to be received in this form
 type Response struct {
@@ -101,6 +131,7 @@ type Response struct {
 type Resources struct {
 	Latest        *CurrentGasPrice
 	Subscriptions map[string]*Subscriber
+	Lock          *sync.RWMutex
 }
 
 // Subscriber - This is one Telegram User, who has interacted with `gasbot`
@@ -109,4 +140,12 @@ type Resources struct {
 type Subscriber struct {
 	User     *telebot.User
 	Criteria *Payload
+}
+
+// CanSendNotification - Checks whether recent gas price update we received
+// can that be sent to subscribed user
+//
+// It'll be sent, if & only if it satisfies criteria set by user
+func (s *Subscriber) CanSendNotification(gasPrice *CurrentGasPrice) bool {
+	return s.Criteria.SatisfiedBy(gasPrice)
 }
