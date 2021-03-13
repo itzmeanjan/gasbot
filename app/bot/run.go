@@ -46,7 +46,7 @@ func Run(resources *data.Resources) error {
 
 		log.Printf("📩 [ /start ] : From @%s\n", m.Sender.Username)
 
-		bot.Send(m.Sender, "Ethereum Gas Price Notifier @ https://gasz.in\n\n/latest : Latest Ethereum Gas Price recommendation\n\nBuilt & maintained by Anjan Roy<anjanroy@yandex.com>\n\nFind more about me @ https://itzmeanjan.in")
+		bot.Send(m.Sender, "Ethereum Gas Price Notifier @ https://gasz.in\n\n/latest : Get latest gas price recommendation\n/subscribe : Get notified when gas price reaches threshold\n\nBuilt & maintained by Anjan Roy<anjanroy@yandex.com>\n\nFind more about me @ https://itzmeanjan.in")
 
 	})
 
@@ -68,7 +68,7 @@ func Run(resources *data.Resources) error {
 	bot.Handle(&fastestTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-		bot.Send(c.Sender, "Fastest")
+		bot.Edit(c.Message, "Fastest")
 
 	})
 
@@ -81,7 +81,7 @@ func Run(resources *data.Resources) error {
 	bot.Handle(&fastTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-		bot.Send(c.Sender, "Fast")
+		bot.Edit(c.Message, "Fast")
 
 	})
 
@@ -93,7 +93,7 @@ func Run(resources *data.Resources) error {
 	bot.Handle(&averageTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-		bot.Send(c.Sender, "Average")
+		bot.Edit(c.Message, "Average")
 
 	})
 
@@ -105,7 +105,7 @@ func Run(resources *data.Resources) error {
 	bot.Handle(&safeLowTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-		bot.Send(c.Sender, "SafeLow")
+		bot.Edit(c.Message, "SafeLow")
 
 	})
 

@@ -148,6 +148,14 @@ func (r *Resources) Notify() {
 
 	for k, v := range r.Subscriptions {
 
+		// These are currently ongoing subscription phases
+		// no need to touch them
+		//
+		// They're not yet confirmed, hopefully will be in sometime future
+		if v.InProgress {
+			continue
+		}
+
 		if !v.CanSendNotification(r.Latest) {
 			continue
 		}
@@ -163,12 +171,64 @@ func (r *Resources) Notify() {
 
 }
 
+// InitSubscription - Subscription is a multi step operation, this is very beginning of it
+// More info to be collected from user
+func (r *Resources) InitSubscription(user *telebot.User, txType string) {
+
+	r.Lock.Lock()
+	defer r.Lock.Unlock()
+
+	r.Subscriptions[user.Username] = &Subscriber{
+		InProgress: true,
+		User:       user,
+		Criteria: &Payload{
+			Field: txType,
+		},
+	}
+
+}
+
+// SetSubscriptionOperator - This is second step of subscription to gas price feed
+// where user selects what's operator to be used when checking whether some gas price
+// update needs to be sent to them or not
+func (r *Resources) SetSubscriptionOperator(user *telebot.User, operator string) {
+
+	r.Lock.RLock()
+	defer r.Lock.RUnlock()
+
+	r.Subscriptions[user.Username].Criteria.Operator = operator
+
+}
+
+// SetSubscriptionThreshold - When gas price of certain category reaches this value, user
+// wants us to notify them
+func (r *Resources) SetSubscriptionThreshold(user *telebot.User, threshold float64) {
+
+	r.Lock.RLock()
+	defer r.Lock.RUnlock()
+
+	r.Subscriptions[user.Username].Criteria.Threshold = threshold
+
+}
+
+// ConfirmSubscription - This subscription is confirmed, now it can
+// be attempted to be processed when latest gas price feed is received
+func (r *Resources) ConfirmSubscription(user *telebot.User) {
+
+	r.Lock.Lock()
+	defer r.Lock.Unlock()
+
+	r.Subscriptions[user.Username].InProgress = false
+
+}
+
 // Subscriber - This is one Telegram User, who has interacted with `gasbot`
 //
 // We're going to be keep track of their subscription interest in this section
 type Subscriber struct {
-	User     *telebot.User
-	Criteria *Payload
+	InProgress bool
+	User       *telebot.User
+	Criteria   *Payload
 }
 
 // CanSendNotification - Checks whether recent gas price update we received
