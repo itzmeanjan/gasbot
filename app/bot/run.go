@@ -65,7 +65,7 @@ func Run(resources *data.Resources) error {
 		Text:   "Fastest",
 	}
 
-	bot.Handle(fastestTxButton, func(c *telebot.Callback) {
+	bot.Handle(&fastestTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
 		bot.Send(c.Sender, "Fastest")
@@ -78,7 +78,7 @@ func Run(resources *data.Resources) error {
 		Text:   "Fast",
 	}
 
-	bot.Handle(fastTxButton, func(c *telebot.Callback) {
+	bot.Handle(&fastTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
 		bot.Send(c.Sender, "Fast")
@@ -90,7 +90,7 @@ func Run(resources *data.Resources) error {
 		Text:   "Average",
 	}
 
-	bot.Handle(averageTxButton, func(c *telebot.Callback) {
+	bot.Handle(&averageTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
 		bot.Send(c.Sender, "Average")
@@ -102,7 +102,7 @@ func Run(resources *data.Resources) error {
 		Text:   "SafeLow",
 	}
 
-	bot.Handle(safeLowTxButton, func(c *telebot.Callback) {
+	bot.Handle(&safeLowTxButton, func(c *telebot.Callback) {
 
 		bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
 		bot.Send(c.Sender, "SafeLow")
