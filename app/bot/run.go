@@ -60,13 +60,102 @@ func Run(resources *data.Resources) error {
 
 	})
 
+	// This is step two of subscription process, where
+	// user is asked to put relational operator to be used
+	// when checking whether some gas price update needs to be
+	// pushed to them or not
+	//
+	// <, >, <=, >=, == these 5 are allowed operators
+	subStepTwo := func() *telebot.ReplyMarkup {
+
+		// -- Buttons for letting user input their choice
+		lesserThan := telebot.InlineButton{
+			Unique: "<",
+			Text:   "<",
+		}
+
+		bot.Handle(&lesserThan, func(c *telebot.Callback) {
+
+			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+			bot.Edit(c.Message, "Fastest")
+
+		})
+
+		greaterThan := telebot.InlineButton{
+			Unique: ">",
+			Text:   ">",
+		}
+
+		bot.Handle(&greaterThan, func(c *telebot.Callback) {
+
+			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+			bot.Edit(c.Message, "Fastest")
+
+		})
+
+		lesserThanOrEqualsTo := telebot.InlineButton{
+			Unique: "<=",
+			Text:   "<=",
+		}
+
+		bot.Handle(&lesserThanOrEqualsTo, func(c *telebot.Callback) {
+
+			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+			bot.Edit(c.Message, "Fastest")
+
+		})
+
+		greaterThanOrEqualsTo := telebot.InlineButton{
+			Unique: ">=",
+			Text:   ">=",
+		}
+
+		bot.Handle(&greaterThanOrEqualsTo, func(c *telebot.Callback) {
+
+			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+			bot.Edit(c.Message, "Fastest")
+
+		})
+
+		equalsTo := telebot.InlineButton{
+			Unique: "==",
+			Text:   "==",
+		}
+
+		bot.Handle(&equalsTo, func(c *telebot.Callback) {
+
+			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
+			bot.Edit(c.Message, "Fastest")
+
+		})
+		// -- Buttons end here, along with their respective handler
+		// definitions
+
+		return &telebot.ReplyMarkup{
+			InlineKeyboard: [][]telebot.InlineButton{
+				{
+					lesserThan,
+					greaterThan,
+				},
+				{
+					lesserThanOrEqualsTo,
+					greaterThanOrEqualsTo,
+				},
+				{
+					equalsTo,
+				},
+			},
+		}
+
+	}
+
 	// This is very first step of subscription
 	//
 	// Here user is asked to select what is his/ her
 	// tx type category for which they would like to get notified
 	subStepOne := func() *telebot.ReplyMarkup {
 
-		// -- Buttons for letting user input
+		// -- Buttons for letting user input their choice
 		fastestTxButton := telebot.InlineButton{
 			Unique: "fastest",
 			Text:   "Fastest",
@@ -75,7 +164,7 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&fastestTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fastest")
+			bot.Edit(c.Message, subStepTwo())
 
 		})
 
@@ -87,7 +176,7 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&fastTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Fast")
+			bot.Edit(c.Message, subStepTwo())
 
 		})
 
@@ -99,7 +188,7 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&averageTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "Average")
+			bot.Edit(c.Message, subStepTwo())
 
 		})
 
@@ -111,7 +200,7 @@ func Run(resources *data.Resources) error {
 		bot.Handle(&safeLowTxButton, func(c *telebot.Callback) {
 
 			bot.Respond(c, &telebot.CallbackResponse{ShowAlert: false})
-			bot.Edit(c.Message, "SafeLow")
+			bot.Edit(c.Message, subStepTwo())
 
 		})
 		// -- Buttons end here, along with their respective handler

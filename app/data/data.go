@@ -207,11 +207,11 @@ func (r *Resources) InitSubscription(user *telebot.User, txType string) bool {
 }
 
 // SetSubscriptionOperator - This is second step of subscription to gas price feed
-// where user selects what's relative operator to be used when checking whether some gas price
+// where user selects what's relational operator to be used when checking whether some gas price
 // update needs to be sent to them or not
 func (r *Resources) SetSubscriptionOperator(user *telebot.User, operator string) bool {
 
-	// Valid relative operators
+	// Valid relational operators
 	if !(operator == "<" || operator == ">" || operator == "<=" || operator == ">=" || operator == "==") {
 		return false
 	}
