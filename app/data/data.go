@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"sync"
@@ -136,148 +137,12 @@ type Resources struct {
 	Lock          *sync.RWMutex
 }
 
-// Notify - As soon as new gas price update is received, it'll
-// iteratively go through each of subscribers & check whether they're
-// eligible to receive this notification or not
-//
-// If yes, they'll be attempted to be notified
-func (r *Resources) Notify() {
-
-	r.Lock.RLock()
-	defer r.Lock.RUnlock()
-
-	for k, v := range r.Subscriptions {
-
-		// These are currently ongoing subscription phases
-		// no need to touch them
-		//
-		// They're not yet confirmed, hopefully will be in sometime future
-		if v.InProgress {
-			continue
-		}
-
-		if !v.CanSendNotification(r.Latest) {
-			continue
-		}
-
-		if err := v.SendNotification(r.Bot, r.Latest); err != nil {
-			log.Printf("❌ Failed to notify @%s that gas price has reached their desired threshold : %s\n", k, err.Error())
-			continue
-		}
-
-		log.Printf("🔔 Notified @%s as Gas Price reached their desired threshold\n", k)
-
-	}
-
-}
-
-// InitSubscription - Subscription is a multi step operation, this is very beginning of it
-// More info to be collected from user
-func (r *Resources) InitSubscription(user *telebot.User, txType string) bool {
-
-	// Valid tx types to which clients can subscribe to
-	if !(txType == "fastest" || txType == "fast" || txType == "average" || txType == "safeLow") {
-		return false
-	}
-
-	r.Lock.Lock()
-	defer r.Lock.Unlock()
-
-	_, ok := r.Subscriptions[user.Username]
-	if ok {
-		return false
-	}
-
-	r.Subscriptions[user.Username] = &Subscriber{
-		InProgress: true,
-		User:       user,
-		Criteria: &Payload{
-			Field: txType,
-		},
-	}
-
-	return true
-
-}
-
-// SetSubscriptionOperator - This is second step of subscription to gas price feed
-// where user selects what's relational operator to be used when checking whether some gas price
-// update needs to be sent to them or not
-func (r *Resources) SetSubscriptionOperator(user *telebot.User, operator string) bool {
-
-	// Valid relational operators
-	if !(operator == "<" || operator == ">" || operator == "<=" || operator == ">=" || operator == "==") {
-		return false
-	}
-
-	r.Lock.RLock()
-	defer r.Lock.RUnlock()
-
-	sub, ok := r.Subscriptions[user.Username]
-	if !ok {
-		return false
-	}
-
-	if !(sub.InProgress && sub.Criteria.Field != "" && sub.Criteria.Operator == "") {
-		return false
-	}
-
-	sub.Criteria.Operator = operator
-	return true
-
-}
-
-// SetSubscriptionThreshold - When gas price of certain category reaches this value ( in Gwei ), user
-// wants us to notify them
-func (r *Resources) SetSubscriptionThreshold(user *telebot.User, threshold float64) bool {
-
-	// Threshold i.e. gas price value against which comparison to be performed
-	// needs to be >= 1.0 Gwei
-	if !(threshold >= 1.0) {
-		return false
-	}
-
-	r.Lock.RLock()
-	defer r.Lock.RUnlock()
-
-	sub, ok := r.Subscriptions[user.Username]
-	if !ok {
-		return false
-	}
-
-	if !(sub.InProgress && sub.Criteria.Field != "" && sub.Criteria.Operator != "" && sub.Criteria.Threshold == 0) {
-		return false
-	}
-
-	sub.Criteria.Threshold = threshold
-	return true
-
-}
-
-// ConfirmSubscription - This subscription is confirmed, now it can
-// be attempted to be processed when latest gas price feed is received
-func (r *Resources) ConfirmSubscription(user *telebot.User) bool {
-
-	r.Lock.Lock()
-	defer r.Lock.Unlock()
-
-	sub, ok := r.Subscriptions[user.Username]
-	if !ok {
-		return false
-	}
-
-	sub.InProgress = false
-	return true
-
-}
-
 // Subscriber - This is one Telegram User, who has interacted with `gasbot`
 //
 // We're going to be keep track of their subscription interest in this section
 type Subscriber struct {
-	InProgress bool
-	User       *telebot.User
-	Criteria   *Payload
+	User     *telebot.User
+	Criteria *Payload
 }
 
 // CanSendNotification - Checks whether recent gas price update we received
@@ -294,5 +159,86 @@ func (s *Subscriber) SendNotification(handle *telebot.Bot, gasPrice *CurrentGasP
 
 	_, err := handle.Send(s.User, s.Criteria.PrepareNotification(gasPrice))
 	return err
+
+}
+
+// Notify - As soon as new gas price update is received, it'll
+// iteratively go through each of subscribers & check whether they're
+// eligible to receive this notification or not
+//
+// If yes, they'll be attempted to be notified
+func (r *Resources) Notify() {
+
+	r.Lock.RLock()
+	defer r.Lock.RUnlock()
+
+	for k, v := range r.Subscriptions {
+
+		if !v.CanSendNotification(r.Latest) {
+			continue
+		}
+
+		if err := v.SendNotification(r.Bot, r.Latest); err != nil {
+			log.Printf("❌ Failed to notify @%s that gas price has reached their desired threshold : %s\n", k, err.Error())
+			continue
+		}
+
+		log.Printf("🔔 Notified @%s as Gas Price reached their desired threshold\n", k)
+
+	}
+
+}
+
+// Subscribe - Subscribes to gas price of certain tx category, with condition to be
+// evaluated on their sake when new gas price is seen, to decide whether we need to
+// notify subscriber or not
+func (r *Resources) Subscribe(user *telebot.User, txType string, operator string, threshold float64) error {
+
+	// Valid tx types to which clients can subscribe to
+	if !(txType == "fastest" || txType == "fast" || txType == "average" || txType == "safeLow") {
+		return errors.New("txType ∈ {fastest, fast, average, safeLow}")
+	}
+
+	// Valid relational operators
+	if !(operator == "<" || operator == ">" || operator == "<=" || operator == ">=" || operator == "==") {
+		return errors.New("operator ∈ {<, >, <=, >=, ==}")
+	}
+
+	// Threshold i.e. gas price value against which comparison to be performed
+	// needs to be >= 1.0 Gwei
+	if !(threshold >= 1.0) {
+		return errors.New("threshold >= 1.0 Gwei")
+	}
+
+	r.Lock.Lock()
+	defer r.Lock.Unlock()
+
+	sub, ok := r.Subscriptions[user.Username]
+	if ok {
+
+		// Because user has already subscribed to
+		// some topic, it'll simply update previous choice
+		// with latest one
+
+		sub.Criteria.Field = txType
+		sub.Criteria.Operator = operator
+		sub.Criteria.Threshold = threshold
+
+		return nil
+
+	}
+
+	// User is subscribing for first time, putting
+	// their entry in in-memory directory
+	r.Subscriptions[user.Username] = &Subscriber{
+		User: user,
+		Criteria: &Payload{
+			Field:     txType,
+			Operator:  operator,
+			Threshold: threshold,
+		},
+	}
+
+	return nil
 
 }
