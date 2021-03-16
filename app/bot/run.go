@@ -64,7 +64,22 @@ func Run(resources *data.Resources) error {
 
 		log.Printf("📩 [ /subscribe ] : From @%s\n", m.Sender.Username)
 
-		bot.Send(m.Sender, "Please choose tx category")
+		txType, operator, threshold, err := parseSubscriptionPayload(m.Payload)
+		if err != nil {
+
+			bot.Send(m.Sender, fmt.Sprintf("❗️ I received : %s", err.Error()))
+			return
+
+		}
+
+		if err := resources.Subscribe(m.Sender, txType, operator, threshold); err != nil {
+
+			bot.Send(m.Sender, fmt.Sprintf("❗️ I received : %s", err.Error()))
+			return
+
+		}
+
+		bot.Send(m.Sender, "🎉  Subscription confirmed")
 
 	})
 
