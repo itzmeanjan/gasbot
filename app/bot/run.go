@@ -98,6 +98,17 @@ func Run(resources *data.Resources) error {
 
 	})
 
+	// These are only commands supported by `gasbot`
+	if err := bot.SetCommands([]telebot.Command{
+		{Text: "latest", Description: "Ask for latest gas price recommendation"},
+		{Text: "subscribe", Description: "Get notified when gas price reaches threshold"},
+		{Text: "unsubscribe", Description: "Unsubscribe from subscribed updates"},
+	}); err != nil {
+
+		return err
+
+	}
+
 	log.Printf("✅ Starting @%s\n", bot.Me.Username)
 
 	// This is a blocking call
