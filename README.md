@@ -95,8 +95,29 @@ WantedBy=multi-user.target
 
 
 - Find `@EthereumGasPriceNotifier_bot` on Telegram & **start** it
+- You should ask for help, by sending `/help`, which gives you one guide on how to interact with this bot properly
 - You can ask it for latest recommended Ethereum Gas Price, by sending command `/latest`
 
 ![bot_at_work](./sc/bot_at_work.jpg)
 
-**Gas Price Subscription feature coming soon ...**
+- You can subscribe to receive notification when recommended gas price of certain category reaches threshold, by sending command of form
+
+> `/subscribe <txType> <operator> <threshold>`
+
+- txType ∈ {`fastest`, `fast`, `avergae`, `safeLow`}
+- operator ∈ {`<`, `>`, `<=`, `>=`, `==`}
+- threshold >= 1.0 ( in Gwei )
+
+For example if you send, 
+
+> `/subscribe fast < 150`
+
+You'll be notified as soon as gas price for `fast` category goes below 150 Gwei.
+
+
+- After you subscribe, you'll keep receiving notification until & unless you unsubscribe from it. It can be done by sending
+
+> `/unsubscribe`
+
+
+![bot_at_work_2](./sc/bot_at_work_2.jpg)
