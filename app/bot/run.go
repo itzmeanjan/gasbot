@@ -83,6 +83,21 @@ func Run(resources *data.Resources) error {
 
 	})
 
+	bot.Handle("/unsubscribe", func(m *telebot.Message) {
+
+		log.Printf("📩 [ /unsubscribe ] : From @%s\n", m.Sender.Username)
+
+		if err := resources.Unsubscribe(m.Sender); err != nil {
+
+			bot.Send(m.Sender, fmt.Sprintf("❗️ I received : %s", err.Error()))
+			return
+
+		}
+
+		bot.Send(m.Sender, "🙂  Unsubscription confirmed")
+
+	})
+
 	log.Printf("✅ Starting @%s\n", bot.Me.Username)
 
 	// This is a blocking call
