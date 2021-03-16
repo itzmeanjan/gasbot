@@ -213,8 +213,7 @@ func (r *Resources) Subscribe(user *telebot.User, txType string, operator string
 	r.Lock.Lock()
 	defer r.Lock.Unlock()
 
-	sub, ok := r.Subscriptions[user.Username]
-	if ok {
+	if sub, ok := r.Subscriptions[user.Username]; ok {
 
 		// Because user has already subscribed to
 		// some topic, it'll simply update previous choice
@@ -238,6 +237,25 @@ func (r *Resources) Subscribe(user *telebot.User, txType string, operator string
 			Threshold: threshold,
 		},
 	}
+
+	return nil
+
+}
+
+// Unsubscribe - Unsubscribes this user from his/ her subscription, if any exists
+func (r *Resources) Unsubscribe(user *telebot.User) error {
+
+	r.Lock.Lock()
+	defer r.Lock.Unlock()
+
+	if _, ok := r.Subscriptions[user.Username]; !ok {
+
+		return errors.New("not subscribed yet")
+
+	}
+
+	// Removing entry
+	delete(r.Subscriptions, user.Username)
 
 	return nil
 
