@@ -23,24 +23,3 @@ func (c *CurrentGasPrice) Sendable() string {
 	return fmt.Sprintf("Fastest : %.2f Gwei 🚀\nFast : %.2f Gwei\nAverage : %.2f Gwei\nSafeLow : %.2f Gwei 🐢", c.Fastest, c.Fast, c.Average, c.SafeLow)
 
 }
-
-// Payload - Subscribe to latest gas price feed of `gasz`, over
-// websocket transport, by sending payload of this form
-type Payload struct {
-	Type      string  `json:"type"`
-	Field     string  `json:"field"`
-	Threshold float64 `json:"threshold"`
-	Operator  string  `json:"operator"`
-}
-
-// Response - Subscription/ unsubscription confirmation messages
-// to be received in this form
-type Response struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-// Resources - ...
-type Resources struct {
-	Latest *CurrentGasPrice
-}
