@@ -1,6 +1,9 @@
 package data
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Payload - Subscribe to latest gas price feed of `gasz`, over
 // websocket transport, by sending payload of this form
@@ -76,13 +79,13 @@ func (p *Payload) PrepareNotification(gasPrice *CurrentGasPrice) string {
 	switch p.Field {
 
 	case "fastest":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Fastest)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f Gwei", strings.ToTitle(p.Field), gasPrice.Fastest)
 	case "fast":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Fast)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f Gwei", strings.ToTitle(p.Field), gasPrice.Fast)
 	case "average":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.Average)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f Gwei", strings.ToTitle(p.Field), gasPrice.Average)
 	case "safeLow":
-		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f", p.Field, gasPrice.SafeLow)
+		notification = fmt.Sprintf("Hey 👋, Gas Price for `%s` tx has reached : %.2f Gwei", strings.ToTitle(p.Field), gasPrice.SafeLow)
 	default:
 		// @note Not doing anything here, because result is negative
 
