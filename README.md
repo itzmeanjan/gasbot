@@ -104,7 +104,7 @@ WantedBy=multi-user.target
 
 > `/subscribe <txType> <operator> <threshold>`
 
-- txType ∈ {`fastest`, `fast`, `avergae`, `safeLow`}
+- txType ∈ {`fastest`, `fast`, `average`, `safeLow`}
 - operator ∈ {`<`, `>`, `<=`, `>=`, `==`}
 - threshold >= 1.0 ( in Gwei )
 
