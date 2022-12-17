@@ -1,3 +1,7 @@
+> **Warning**
+
+**I've stopped maintaining this project !**
+
 # gasbot 🤖
 Telegram Bot for Ethereum Gas Price Notification [`@EthereumGasPriceNotifier_bot`](https://t.me/EthereumGasPriceNotifier_bot)
 
@@ -5,7 +9,7 @@ Telegram Bot for Ethereum Gas Price Notification [`@EthereumGasPriceNotifier_bot
 
 Sometime ago I created one service for getting notified about recommended Ethereum Gas Price changes. It's called `gasz : Ethereum Gas Price Notifier`.
 
-You can use it @ https://gasz.in
+~You can use it @ https://gasz.in~
 
 It has Web Notification functionality & how it works is like 👇
 
